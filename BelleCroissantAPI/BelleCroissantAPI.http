@@ -1,0 +1,6 @@
+@BelleCroissantAPI_HostAddress = http://localhost:5265
+
+GET {{BelleCroissantAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
