@@ -683,23 +683,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\s6402041520201\\.nuget\\packages\\": {},
+    "C:\\Users\\OS\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\BelleCroissantAPI.csproj",
+      "projectUniqueName": "C:\\Users\\OS\\Desktop\\BelleCroissantAPI\\BelleCroissantAPI\\BelleCroissantAPI.csproj",
       "projectName": "BelleCroissantAPI",
-      "projectPath": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\BelleCroissantAPI.csproj",
-      "packagesPath": "C:\\Users\\s6402041520201\\.nuget\\packages\\",
-      "outputPath": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\obj\\",
+      "projectPath": "C:\\Users\\OS\\Desktop\\BelleCroissantAPI\\BelleCroissantAPI\\BelleCroissantAPI.csproj",
+      "packagesPath": "C:\\Users\\OS\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\OS\\Desktop\\BelleCroissantAPI\\BelleCroissantAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\s6402041520201\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\OS\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

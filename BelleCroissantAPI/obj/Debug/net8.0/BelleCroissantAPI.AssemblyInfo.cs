@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BelleCroissantAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b96f6c850eeb21adb351212cd027f57461cc9661")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+72851cf7476c1c9ec15b6447dbf7846de9036e61")]
 [assembly: System.Reflection.AssemblyProductAttribute("BelleCroissantAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BelleCroissantAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
