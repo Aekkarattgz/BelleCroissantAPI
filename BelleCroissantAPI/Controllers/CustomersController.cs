@@ -1,180 +1,126 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BelleCroissantAPI.Model;
-using System.Data.SqlClient;
+﻿using Microsoft.AspNetCore.Mvc; // นำเข้าไลบรารีที่ใช้ในการสร้าง Web API
+using Microsoft.EntityFrameworkCore; // นำเข้าไลบรารีที่ใช้ในการติดต่อกับฐานข้อมูล (EF Core)
+using BelleCroissantAPI.Models; // ใช้ namespace ของ model สำหรับใช้งานโมเดลต่าง ๆ ที่กำหนดไว้ในโปรเจกต์
+using BelleCroissantAPI.Data; // ใช้ namespace สำหรับการเข้าถึงข้อมูลจากฐานข้อมูล
 
-namespace BelleCroissantAPI.Controllers
+namespace BelleCroissantAPI.Controllers // กำหนด namespace สำหรับ controller ของ API
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class CustomersController : ControllerBase
+    [Route("api/[controller]")] // กำหนดเส้นทางของ URL ที่เข้าถึง API เช่น /api/customers
+    [ApiController] // ระบุว่าเป็น API Controller เพื่อให้ ASP.NET Core จัดการคำขอ HTTP
+    public class CustomersController : ControllerBase // กำหนด class ของ API Controller สำหรับการจัดการข้อมูลลูกค้า
     {
-        private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _context; // สร้างตัวแปรสำหรับเก็บข้อมูล ApplicationDbContext
 
-        public CustomersController(IConfiguration configuration)
+        // Constructor: Inject ApplicationDbContext เพื่อใช้จัดการฐานข้อมูล
+        public CustomersController(ApplicationDbContext context)
         {
-            _configuration = configuration;
+            _context = context; // กำหนดค่า _context ให้เป็น instance ของ ApplicationDbContext ที่รับมาจาก constructor
         }
 
-        // GET: api/Customers
-        // ดึงข้อมูลทั้งหมดของลูกค้า
-        [HttpGet]
-        public IActionResult GetAllCustomers()
+        // GET: api/customers
+        // ดึงข้อมูลลูกค้าทั้งหมด
+        [HttpGet] // กำหนด HTTP method เป็น GET
+        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
-            try
-            {
-                List<Customer> customers = new List<Customer>();
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            // ใช้ LINQ เพื่อดึงข้อมูลลูกค้าทั้งหมดจากฐานข้อมูล
+            var customers = await (from customer in _context.Customers
+                                   select customer).ToListAsync(); // ทำการดึงข้อมูลและแปลงเป็น List แบบอะซิงโครนัส
 
-                using (SqlConnection con = new SqlConnection(connectionString))
-                {
-                    con.Open();
-                    string query = "SELECT id, name, email FROM Customers";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var customer = new Customer
-                                {
-                                    id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    name = reader.GetString(reader.GetOrdinal("name")),
-                                    email = reader.GetString(reader.GetOrdinal("email"))
-                                };
-                                customers.Add(customer);
-                            }
-                        }
-                    }
-                }
-
-                return Ok(customers);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            return Ok(customers); // คืนค่าผลลัพธ์ลูกค้าในรูปแบบ HTTP 200 OK
         }
 
-        // GET: api/Customers/{id}
-        // ดึงข้อมูลลูกค้าตาม id
-        [HttpGet("{id}")]
-        public IActionResult GetCustomerById(int id)
+        // GET: api/customers/5
+        // ดึงข้อมูลลูกค้าตาม ID
+        [HttpGet("{id}")] // กำหนด URL ที่รับค่า id ของลูกค้า
+        public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
-            try
+            // ใช้ LINQ เพื่อดึงข้อมูลลูกค้าตาม ID
+            var customer = await (from c in _context.Customers
+                                  where c.CustomerId == id
+                                  select c).FirstOrDefaultAsync(); // ค้นหาลูกค้าตาม ID และดึงมาแค่ 1 ตัว
+
+            if (customer == null)
             {
-                Customer customer = null;
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-                using (SqlConnection con = new SqlConnection(connectionString))
-                {
-                    con.Open();
-                    string query = "SELECT id, name, email FROM Customers WHERE id = @id";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.Parameters.AddWithValue("@id", id);
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                customer = new Customer
-                                {
-                                    id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    name = reader.GetString(reader.GetOrdinal("name")),
-                                    email = reader.GetString(reader.GetOrdinal("email"))
-                                };
-                            }
-                        }
-                    }
-                }
-
-                if (customer == null)
-                {
-                    return NotFound(); // หากไม่พบข้อมูลลูกค้า
-                }
-
-                return Ok(customer);
+                return NotFound(); // หากไม่พบข้อมูลลูกค้า ให้คืนค่าผลลัพธ์ HTTP 404 Not Found
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+
+            return Ok(customer); // คืนค่าลูกค้าในรูปแบบ HTTP 200 OK
         }
 
-        // POST: api/Customers
-        // เพิ่มลูกค้าใหม่
-        [HttpPost]
-        public IActionResult AddCustomer([FromBody] Customer newCustomer)
+        // POST: api/customers
+        // เพิ่มข้อมูลลูกค้าใหม่
+        [HttpPost] // กำหนด HTTP method เป็น POST สำหรับการเพิ่มข้อมูล
+        public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
         {
-            try
-            {
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            // เพิ่มข้อมูลลูกค้าใหม่เข้า DbSet
+            _context.Customers.Add(customer);
+            await _context.SaveChangesAsync(); // บันทึกการเปลี่ยนแปลงในฐานข้อมูลแบบอะซิงโครนัส
 
-                using (SqlConnection con = new SqlConnection(connectionString))
-                {
-                    con.Open();
-                    string query = "INSERT INTO Customers (name, email) VALUES (@name, @email)";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.Parameters.AddWithValue("@name", newCustomer.name);
-                        cmd.Parameters.AddWithValue("@email", newCustomer.email);
-
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
-                        {
-                            return CreatedAtAction(nameof(GetCustomerById), new { id = newCustomer.id }, newCustomer);
-                        }
-                        else
-                        {
-                            return StatusCode(500, "Error inserting new customer.");
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            // Return 201 Created พร้อม URL ของข้อมูลที่สร้างใหม่
+            return CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer); // คืนค่าผลลัพธ์ HTTP 201 Created
         }
 
-        // PUT: api/Customers/{id}
-        // อัปเดตข้อมูลลูกค้าตาม id
-        [HttpPut("{id}")]
-        public IActionResult UpdateCustomer(int id, [FromBody] Customer updatedCustomer)
+        // PUT: api/customers/5
+        // อัปเดตข้อมูลลูกค้า
+        [HttpPut("{id}")] // กำหนด URL สำหรับการอัปเดตข้อมูลลูกค้าตาม id
+        public async Task<IActionResult> PutCustomer(int id, Customer customer)
         {
+            // ตรวจสอบว่า ID ตรงกันหรือไม่
+            if (id != customer.CustomerId)
+            {
+                return BadRequest(); // หาก ID ไม่ตรงกัน คืนค่าผลลัพธ์ HTTP 400 Bad Request
+            }
+
+            // ตั้งค่า Entity State เป็น Modified เพื่อเตรียมบันทึกการเปลี่ยนแปลง
+            _context.Entry(customer).State = EntityState.Modified;
+
             try
             {
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-                using (SqlConnection con = new SqlConnection(connectionString))
+                await _context.SaveChangesAsync(); // บันทึกการเปลี่ยนแปลงในฐานข้อมูล
+            }
+            catch (DbUpdateConcurrencyException) // กรณีเกิดข้อผิดพลาดการอัปเดตข้อมูล
+            {
+                // ตรวจสอบว่าลูกค้าตาม ID มีอยู่หรือไม่
+                if (!CustomerExists(id))
                 {
-                    con.Open();
-                    string query = "UPDATE Customers SET name = @name, email = @email WHERE id = @id";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.Parameters.AddWithValue("@name", updatedCustomer.name);
-                        cmd.Parameters.AddWithValue("@email", updatedCustomer.email);
-                        cmd.Parameters.AddWithValue("@id", id);
-
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
-                        {
-                            return NoContent(); // แสดงว่าอัปเดตสำเร็จ
-                        }
-                        else
-                        {
-                            return NotFound(); // หากไม่พบลูกค้าตาม id ที่ระบุ
-                        }
-                    }
+                    return NotFound(); // หากไม่พบข้อมูลลูกค้า ให้คืนค่าผลลัพธ์ HTTP 404 Not Found
+                }
+                else
+                {
+                    throw; // หากมีข้อผิดพลาดอื่น ๆ ให้โยนข้อผิดพลาดออกไป
                 }
             }
-            catch (Exception ex)
+
+            return NoContent(); // คืนค่าผลลัพธ์ HTTP 204 No Content หากการอัปเดตสำเร็จ
+        }
+
+        // DELETE: api/customers/5
+        // ลบข้อมูลลูกค้า
+        [HttpDelete("{id}")] // กำหนด URL สำหรับการลบข้อมูลลูกค้าตาม id
+        public async Task<ActionResult<Customer>> DeleteCustomer(int id)
+        {
+            // ค้นหาลูกค้าตาม ID
+            var customer = await (from c in _context.Customers
+                                  where c.CustomerId == id
+                                  select c).FirstOrDefaultAsync(); // ค้นหาลูกค้าตาม ID และดึงมาแค่ 1 ตัว
+
+            if (customer == null)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return NotFound(); // หากไม่พบข้อมูลลูกค้า ให้คืนค่าผลลัพธ์ HTTP 404 Not Found
             }
+
+            // ลบข้อมูลลูกค้า
+            _context.Customers.Remove(customer);
+            await _context.SaveChangesAsync(); // บันทึกการเปลี่ยนแปลงในฐานข้อมูล
+
+            return Ok(customer); // คืนค่าข้อมูลลูกค้าที่ถูกลบในรูปแบบ HTTP 200 OK
+        }
+
+        // Method: ตรวจสอบว่าลูกค้าตาม ID มีอยู่ในฐานข้อมูลหรือไม่
+        private bool CustomerExists(int id)
+        {
+            // ใช้ LINQ เพื่อตรวจสอบว่ามีข้อมูลลูกค้าตาม ID หรือไม่
+            return _context.Customers.Any(c => c.CustomerId == id);
         }
     }
 }

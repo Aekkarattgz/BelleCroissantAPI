@@ -1,232 +1,172 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BelleCroissantAPI.Model;
-using System.Data.SqlClient;
+﻿using Microsoft.AspNetCore.Mvc; // ใช้สำหรับการสร้าง Controller และ Action
+using Microsoft.EntityFrameworkCore; // ใช้สำหรับการจัดการ Entity Framework Core
+using BelleCroissantAPI.Models; // อ้างอิงไปยังโมเดล Order, Customer, Product, OrderItems
+using BelleCroissantAPI.Data; // อ้างอิงไปยังคลาส ApplicationDbContext
+using System.Linq; // ใช้สำหรับ LINQ
+using System.Threading.Tasks; // ใช้สำหรับการทำงานแบบ Asynchronous
 
 namespace BelleCroissantAPI.Controllers
 {
-    // การตั้งค่า Route สำหรับ controller
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("api/[controller]")] // ระบุเส้นทางของ API (/api/Orders)
+    [ApiController] // กำหนดให้ Controller นี้เป็น API Controller
     public class OrdersController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _context; // ตัวแปรสำหรับจัดการฐานข้อมูลผ่าน EF Core
 
-        // ตัวแปร configuration สำหรับการเข้าถึงการตั้งค่าภายในไฟล์ appsettings.json (เช่น connection string)
-        public OrdersController(IConfiguration configuration)
+        // Constructor เพื่อ Inject ApplicationDbContext
+        public OrdersController(ApplicationDbContext context)
         {
-            _configuration = configuration;
+            _context = context; // กำหนดค่าตัวแปร _context จาก context ที่ Inject เข้ามา
         }
 
-        // GET: api/orders
-        // ดึงข้อมูลคำสั่งซื้อทั้งหมดจากฐานข้อมูล
-        [HttpGet]
-        public IActionResult GetAllOrders()
+        // GET: api/Orders
+        [HttpGet] // ระบุว่าเป็น HTTP GET
+        public async Task<IActionResult> GetOrders()
         {
             try
             {
-                // สร้างรายการของคำสั่งซื้อ
-                List<Order> orders = new List<Order>();
-                // ดึง connection string จากการตั้งค่า
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                // Query ข้อมูล Order พร้อม Include ข้อมูลที่สัมพันธ์กัน
+                var orders = await _context.Orders
+                    .Include(o => o.Customer) // Include ข้อมูล Customer
+                    .Include(o => o.OrderItems) // Include ข้อมูล OrderItems
+                    .ThenInclude(oi => oi.Product) // Include Product ภายใน OrderItems
+                    .AsNoTracking() // ใช้ AsNoTracking เพื่อปรับปรุงประสิทธิภาพสำหรับการอ่านข้อมูล
+                    .ToListAsync(); // เรียกข้อมูลในรูปแบบ List แบบ Asynchronous
 
-                // สร้างการเชื่อมต่อกับฐานข้อมูล
-                using (SqlConnection con = new SqlConnection(connectionString))
+                // เช็คว่ามีข้อมูลหรือไม่
+                if (orders == null || !orders.Any())
                 {
-                    con.Open(); // เปิดการเชื่อมต่อ
-                    // สร้างคำสั่ง SQL สำหรับดึงข้อมูลคำสั่งซื้อทั้งหมด
-                    string query = "SELECT OrderId, CustomerId, OrderDate, IsCompleted, Status FROM Orders";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        // ดำเนินการคำสั่ง SQL และอ่านผลลัพธ์
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read()) // อ่านข้อมูลแต่ละแถวจากผลลัพธ์
-                            {
-                                var order = new Order
-                                {
-                                    OrderId = reader.GetInt32(reader.GetOrdinal("OrderId")), // ดึง OrderId
-                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")), // ดึง CustomerId
-                                    OrderDate = reader.GetDateTime(reader.GetOrdinal("OrderDate")), // ดึง DateTime ของการสั่งซื้อ
-                                    IsCompleted = reader.GetBoolean(reader.GetOrdinal("IsCompleted")), // ดึงสถานะการเสร็จสมบูรณ์
-                                    Status = reader.GetString(reader.GetOrdinal("Status")) // ดึงสถานะคำสั่งซื้อ
-                                };
-                                orders.Add(order); // เพิ่มคำสั่งซื้อในรายการ
-                            }
-                        }
-                    }
+                    return NotFound(new { message = "No orders found." }); // ถ้าไม่มีข้อมูลให้ส่งสถานะ 404
                 }
 
-                return Ok(orders); // ส่งคืนรายการคำสั่งซื้อทั้งหมดในรูปแบบ JSON
+                return Ok(orders); // ส่งข้อมูลกลับในรูปแบบ JSON พร้อมสถานะ 200
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}"); // หากเกิดข้อผิดพลาด
+                // ส่งสถานะ 500 และข้อความเมื่อมีข้อผิดพลาด
+                return StatusCode(500, new { message = "An error occurred while retrieving orders.", error = ex.Message });
             }
         }
 
-        // GET: api/orders/{id}
-        // ดึงข้อมูลคำสั่งซื้อตาม ID
-        [HttpGet("{id}")]
-        public IActionResult GetOrderById(int id)
+        // GET: api/Orders/{id}
+        [HttpGet("{id}")] // ระบุว่าเป็น HTTP GET พร้อมรับค่า {id} จาก URL
+        public async Task<IActionResult> GetOrder(int id)
         {
             try
             {
-                Order order = null;
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                // Query ข้อมูล Order ตาม ID พร้อม Include ข้อมูลที่สัมพันธ์กัน
+                var order = await _context.Orders
+                    .Include(o => o.Customer) // Include ข้อมูล Customer
+                    .Include(o => o.OrderItems) // Include ข้อมูล OrderItems
+                    .ThenInclude(oi => oi.Product) // Include Product ภายใน OrderItems
+                    .AsNoTracking() // ใช้ AsNoTracking เพื่อปรับปรุงประสิทธิภาพสำหรับการอ่านข้อมูล
+                    .FirstOrDefaultAsync(o => o.TransactionId == id); // หา Order ที่ตรงกับ ID
 
-                using (SqlConnection con = new SqlConnection(connectionString))
-                {
-                    con.Open();
-                    // สร้างคำสั่ง SQL สำหรับดึงข้อมูลคำสั่งซื้อที่ตรงกับ OrderId
-                    string query = "SELECT OrderId, CustomerId, OrderDate, IsCompleted, Status FROM Orders WHERE OrderId = @id";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.Parameters.AddWithValue("@id", id); // เพิ่มพารามิเตอร์สำหรับ OrderId
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read()) // หากพบคำสั่งซื้อที่ตรงกับ ID
-                            {
-                                order = new Order
-                                {
-                                    OrderId = reader.GetInt32(reader.GetOrdinal("OrderId")),
-                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                                    OrderDate = reader.GetDateTime(reader.GetOrdinal("OrderDate")),
-                                    IsCompleted = reader.GetBoolean(reader.GetOrdinal("IsCompleted")),
-                                    Status = reader.GetString(reader.GetOrdinal("Status"))
-                                };
-                            }
-                        }
-                    }
-                }
-
+                // เช็คว่าพบ Order หรือไม่
                 if (order == null)
                 {
-                    return NotFound(); // หากไม่พบคำสั่งซื้อ
+                    return NotFound(new { message = $"Order with ID {id} not found." }); // ส่งสถานะ 404 ถ้าไม่พบ
                 }
 
-                return Ok(order); // ส่งคืนคำสั่งซื้อที่พบ
+                return Ok(order); // ส่งข้อมูลกลับในรูปแบบ JSON พร้อมสถานะ 200
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}"); // หากเกิดข้อผิดพลาด
+                // ส่งสถานะ 500 และข้อความเมื่อมีข้อผิดพลาด
+                return StatusCode(500, new { message = "An error occurred while retrieving the order.", error = ex.Message });
             }
         }
 
-        // POST: api/orders
-        // เพิ่มคำสั่งซื้อใหม่
-        [HttpPost]
-        public IActionResult AddOrder([FromBody] Order newOrder)
+        // POST: api/Orders
+        [HttpPost] // ระบุว่าเป็น HTTP POST
+        public async Task<IActionResult> CreateOrder([FromBody] Order order) // รับข้อมูล Order จาก Body ของ Request
         {
+            // ตรวจสอบความถูกต้องของ ModelState
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // ส่งสถานะ 400 ถ้า ModelState ไม่ถูกต้อง
+            }
+
             try
             {
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                _context.Orders.Add(order); // เพิ่ม Order ใหม่ลงในฐานข้อมูล
+                await _context.SaveChangesAsync(); // บันทึกการเปลี่ยนแปลงในฐานข้อมูลแบบ Asynchronous
 
-                using (SqlConnection con = new SqlConnection(connectionString))
-                {
-                    con.Open();
-                    // สร้างคำสั่ง SQL สำหรับการเพิ่มคำสั่งซื้อใหม่
-                    string query = "INSERT INTO Orders (CustomerId, OrderDate, IsCompleted, Status) VALUES (@customerId, @orderDate, @isCompleted, @status)";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        // เพิ่มพารามิเตอร์ที่รับค่าจากคำสั่งซื้อใหม่
-                        cmd.Parameters.AddWithValue("@customerId", newOrder.CustomerId);
-                        cmd.Parameters.AddWithValue("@orderDate", newOrder.OrderDate);
-                        cmd.Parameters.AddWithValue("@isCompleted", newOrder.IsCompleted);
-                        cmd.Parameters.AddWithValue("@status", newOrder.Status);
-
-                        int rowsAffected = cmd.ExecuteNonQuery(); // รันคำสั่ง SQL
-                        if (rowsAffected > 0)
-                        {
-                            return CreatedAtAction(nameof(GetOrderById), new { id = newOrder.OrderId }, newOrder); // คืนค่าคำสั่งซื้อใหม่ที่ถูกสร้าง
-                        }
-                        else
-                        {
-                            return StatusCode(500, "Error inserting new order."); // หากไม่สามารถเพิ่มคำสั่งซื้อได้
-                        }
-                    }
-                }
+                // ส่งสถานะ 201 พร้อมข้อมูล Order และลิงก์ไปยัง GetOrder
+                return CreatedAtAction(nameof(GetOrder), new { id = order.TransactionId }, order);
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}"); // หากเกิดข้อผิดพลาด
+                // ส่งสถานะ 500 และข้อความเมื่อมีข้อผิดพลาด
+                return StatusCode(500, new { message = "An error occurred while creating the order.", error = ex.Message });
             }
         }
 
-        // PUT: api/orders/{id}/complete
-        // ทำเครื่องหมายว่าเสร็จสมบูรณ์
-        [HttpPut("{id}/complete")]
-        public IActionResult CompleteOrder(int id)
+        // PUT: api/Orders/{id}
+        [HttpPut("{id}")] // ระบุว่าเป็น HTTP PUT พร้อมรับค่า {id} จาก URL
+        public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order order) // รับ Order ที่ต้องการอัปเดตจาก Body ของ Request
         {
+            // ตรวจสอบว่า ID ใน URL และ Order ตรงกันหรือไม่
+            if (id != order.TransactionId)
+            {
+                return BadRequest(new { message = "Order ID mismatch." }); // ส่งสถานะ 400 ถ้าไม่ตรงกัน
+            }
+
+            // ตรวจสอบความถูกต้องของ ModelState
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // ส่งสถานะ 400 ถ้า ModelState ไม่ถูกต้อง
+            }
+
             try
             {
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                _context.Entry(order).State = EntityState.Modified; // ตั้งค่า State ของ Order เป็น Modified
+                await _context.SaveChangesAsync(); // บันทึกการเปลี่ยนแปลงในฐานข้อมูลแบบ Asynchronous
 
-                using (SqlConnection con = new SqlConnection(connectionString))
-                {
-                    con.Open();
-                    // สร้างคำสั่ง SQL เพื่ออัปเดตคำสั่งซื้อว่าเสร็จสมบูรณ์
-                    string query = "UPDATE Orders SET IsCompleted = 1, Status = 'Completed' WHERE OrderId = @id";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.Parameters.AddWithValue("@id", id); // เพิ่มพารามิเตอร์สำหรับ OrderId
-
-                        int rowsAffected = cmd.ExecuteNonQuery(); // รันคำสั่ง SQL
-                        if (rowsAffected > 0)
-                        {
-                            return NoContent(); // อัปเดตคำสั่งซื้อสำเร็จ
-                        }
-                        else
-                        {
-                            return NotFound(); // หากไม่พบคำสั่งซื้อ
-                        }
-                    }
-                }
+                return NoContent(); // ส่งสถานะ 204 เมื่ออัปเดตสำเร็จ
             }
-            catch (Exception ex)
+            catch (DbUpdateConcurrencyException)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}"); // หากเกิดข้อผิดพลาด
+                // ตรวจสอบว่า Order มีอยู่จริงหรือไม่
+                if (!OrderExists(id))
+                {
+                    return NotFound(new { message = $"Order with ID {id} not found." }); // ส่งสถานะ 404 ถ้าไม่พบ
+                }
+
+                // ส่งสถานะ 500 หากเกิดข้อผิดพลาดอื่น
+                return StatusCode(500, new { message = "An error occurred while updating the order." });
             }
         }
 
-        // PUT: api/orders/{id}/cancel
-        // ยกเลิกคำสั่งซื้อ
-        [HttpPut("{id}/cancel")]
-        public IActionResult CancelOrder(int id)
+        // DELETE: api/Orders/{id}
+        [HttpDelete("{id}")] // ระบุว่าเป็น HTTP DELETE พร้อมรับค่า {id} จาก URL
+        public async Task<IActionResult> DeleteOrder(int id)
         {
             try
             {
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-                using (SqlConnection con = new SqlConnection(connectionString))
+                // ค้นหา Order ตาม ID
+                var order = await _context.Orders.FindAsync(id);
+                if (order == null)
                 {
-                    con.Open();
-                    // สร้างคำสั่ง SQL เพื่ออัปเดตคำสั่งซื้อว่าเป็นสถานะ "Cancelled"
-                    string query = "UPDATE Orders SET IsCompleted = 0, Status = 'Cancelled' WHERE OrderId = @id";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.Parameters.AddWithValue("@id", id); // เพิ่มพารามิเตอร์สำหรับ OrderId
-
-                        int rowsAffected = cmd.ExecuteNonQuery(); // รันคำสั่ง SQL
-                        if (rowsAffected > 0)
-                        {
-                            return NoContent(); // การยกเลิกคำสั่งซื้อสำเร็จ
-                        }
-                        else
-                        {
-                            return NotFound(); // หากไม่พบคำสั่งซื้อ
-                        }
-                    }
+                    return NotFound(new { message = $"Order with ID {id} not found." }); // ส่งสถานะ 404 ถ้าไม่พบ
                 }
+
+                _context.Orders.Remove(order); // ลบ Order จากฐานข้อมูล
+                await _context.SaveChangesAsync(); // บันทึกการเปลี่ยนแปลงในฐานข้อมูลแบบ Asynchronous
+
+                return NoContent(); // ส่งสถานะ 204 เมื่อการลบสำเร็จ
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}"); // หากเกิดข้อผิดพลาด
+                // ส่งสถานะ 500 และข้อความเมื่อมีข้อผิดพลาด
+                return StatusCode(500, new { message = "An error occurred while deleting the order.", error = ex.Message });
             }
+        }
+
+        // ตรวจสอบว่า Order มีอยู่ในฐานข้อมูลหรือไม่
+        private bool OrderExists(int id)
+        {
+            return _context.Orders.Any(e => e.TransactionId == id); // คืนค่า true ถ้าพบ Order ที่มี ID ตรงกัน
         }
     }
 }
