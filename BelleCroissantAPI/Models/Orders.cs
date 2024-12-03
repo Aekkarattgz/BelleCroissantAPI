@@ -38,12 +38,13 @@ namespace BelleCroissantAPI.Models
         public int? PromotionId { get; set; } // Promotion ที่ใช้ (ถ้ามี)
 
         [Column(TypeName = "decimal(10, 2)")]
-        public decimal? DiscountAmount { get; set; } // ส่วนลด (ถ้ามี)
+        public decimal DiscountAmount { get; set; } = 0; // ส่วนลด (ถ้ามี)
 
         // ** Navigation Properties **
         [ForeignKey("CustomerId")]
         public virtual Customer Customer { get; set; } // เชื่อมกับตาราง Customer (FK)
 
-        public virtual ICollection<OrderItem> OrderItems { get; set; } // รายการสินค้าภายใน Order
+        public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();// รายการสินค้าภายใน Order
+        
     }
 }

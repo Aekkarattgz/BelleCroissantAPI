@@ -28,7 +28,7 @@ namespace BelleCroissantAPI.Models
         [Range(0, double.MaxValue)]
         public decimal Cost { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
         [Required]
         public bool Seasonal { get; set; }
         [Required]
@@ -37,9 +37,9 @@ namespace BelleCroissantAPI.Models
         [Required]
         public DateTime IntroducedDate { get; set; }
 
-        public string Ingredients { get; set; }
+        public string? Ingredients { get; set; }
 
         // Navigation Properties
-        public virtual ICollection<OrderItem> OrderItems { get; set; }
+        public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

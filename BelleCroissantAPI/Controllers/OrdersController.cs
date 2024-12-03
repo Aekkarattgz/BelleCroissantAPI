@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore; // ใช้สำหรับการจัดการ Entity Framework Core
 using BelleCroissantAPI.Models; // อ้างอิงไปยังโมเดล Order, Customer, Product, OrderItems
 using BelleCroissantAPI.Data; // อ้างอิงไปยังคลาส ApplicationDbContext
+using Microsoft.Extensions.Logging; // ใช้สำหรับการ log ข้อมูล
 using System.Linq; // ใช้สำหรับ LINQ
 using System.Threading.Tasks; // ใช้สำหรับการทำงานแบบ Asynchronous
 
@@ -12,11 +13,13 @@ namespace BelleCroissantAPI.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly ApplicationDbContext _context; // ตัวแปรสำหรับจัดการฐานข้อมูลผ่าน EF Core
+        private readonly ILogger<OrdersController> _logger; // ตัวแปรสำหรับการ log ข้อมูล
 
-        // Constructor เพื่อ Inject ApplicationDbContext
-        public OrdersController(ApplicationDbContext context)
+        // Constructor เพื่อ Inject ApplicationDbContext และ ILogger
+        public OrdersController(ApplicationDbContext context, ILogger<OrdersController> logger)
         {
             _context = context; // กำหนดค่าตัวแปร _context จาก context ที่ Inject เข้ามา
+            _logger = logger; // กำหนดค่าตัวแปร _logger
         }
 
         // GET: api/Orders
@@ -31,12 +34,24 @@ namespace BelleCroissantAPI.Controllers
                     .Include(o => o.OrderItems) // Include ข้อมูล OrderItems
                     .ThenInclude(oi => oi.Product) // Include Product ภายใน OrderItems
                     .AsNoTracking() // ใช้ AsNoTracking เพื่อปรับปรุงประสิทธิภาพสำหรับการอ่านข้อมูล
+                    .Take(50) // จำกัดผลลัพธ์ที่ดึงออกมาเป็น 50 แถว
                     .ToListAsync(); // เรียกข้อมูลในรูปแบบ List แบบ Asynchronous
 
                 // เช็คว่ามีข้อมูลหรือไม่
                 if (orders == null || !orders.Any())
                 {
+                    _logger.LogInformation("No orders found.");
                     return NotFound(new { message = "No orders found." }); // ถ้าไม่มีข้อมูลให้ส่งสถานะ 404
+                }
+
+                // ปริ้นข้อมูลที่ได้ออกมาดู
+                foreach (var order in orders)
+                {
+                    _logger.LogInformation($"Order ID: {order.TransactionId}, Customer: {order.Customer?.FirstName} {order.Customer?.LastName}");
+                    foreach (var orderItem in order.OrderItems)
+                    {
+                        _logger.LogInformation($"  Order Item ID: {orderItem.OrderItemId}, Product: {orderItem.Product?.ProductName}, Quantity: {orderItem.Quantity}");
+                    }
                 }
 
                 return Ok(orders); // ส่งข้อมูลกลับในรูปแบบ JSON พร้อมสถานะ 200
@@ -44,6 +59,7 @@ namespace BelleCroissantAPI.Controllers
             catch (System.Exception ex)
             {
                 // ส่งสถานะ 500 และข้อความเมื่อมีข้อผิดพลาด
+                _logger.LogError(ex, "An error occurred while retrieving orders.");
                 return StatusCode(500, new { message = "An error occurred while retrieving orders.", error = ex.Message });
             }
         }
@@ -65,7 +81,15 @@ namespace BelleCroissantAPI.Controllers
                 // เช็คว่าพบ Order หรือไม่
                 if (order == null)
                 {
+                    _logger.LogInformation($"Order with ID {id} not found.");
                     return NotFound(new { message = $"Order with ID {id} not found." }); // ส่งสถานะ 404 ถ้าไม่พบ
+                }
+
+                // ปริ้นข้อมูลที่ได้ออกมาดู
+                _logger.LogInformation($"Order ID: {order.TransactionId}, Customer: {order.Customer?.FirstName} {order.Customer?.LastName}");
+                foreach (var orderItem in order.OrderItems)
+                {
+                    _logger.LogInformation($"  Order Item ID: {orderItem.OrderItemId}, Product: {orderItem.Product?.ProductName}, Quantity: {orderItem.Quantity}");
                 }
 
                 return Ok(order); // ส่งข้อมูลกลับในรูปแบบ JSON พร้อมสถานะ 200
@@ -73,6 +97,7 @@ namespace BelleCroissantAPI.Controllers
             catch (System.Exception ex)
             {
                 // ส่งสถานะ 500 และข้อความเมื่อมีข้อผิดพลาด
+                _logger.LogError(ex, "An error occurred while retrieving the order.");
                 return StatusCode(500, new { message = "An error occurred while retrieving the order.", error = ex.Message });
             }
         }
@@ -98,75 +123,59 @@ namespace BelleCroissantAPI.Controllers
             catch (System.Exception ex)
             {
                 // ส่งสถานะ 500 และข้อความเมื่อมีข้อผิดพลาด
+                _logger.LogError(ex, "An error occurred while creating the order.");
                 return StatusCode(500, new { message = "An error occurred while creating the order.", error = ex.Message });
             }
         }
 
-        // PUT: api/Orders/{id}
-        [HttpPut("{id}")] // ระบุว่าเป็น HTTP PUT พร้อมรับค่า {id} จาก URL
-        public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order order) // รับ Order ที่ต้องการอัปเดตจาก Body ของ Request
-        {
-            // ตรวจสอบว่า ID ใน URL และ Order ตรงกันหรือไม่
-            if (id != order.TransactionId)
-            {
-                return BadRequest(new { message = "Order ID mismatch." }); // ส่งสถานะ 400 ถ้าไม่ตรงกัน
-            }
-
-            // ตรวจสอบความถูกต้องของ ModelState
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState); // ส่งสถานะ 400 ถ้า ModelState ไม่ถูกต้อง
-            }
-
-            try
-            {
-                _context.Entry(order).State = EntityState.Modified; // ตั้งค่า State ของ Order เป็น Modified
-                await _context.SaveChangesAsync(); // บันทึกการเปลี่ยนแปลงในฐานข้อมูลแบบ Asynchronous
-
-                return NoContent(); // ส่งสถานะ 204 เมื่ออัปเดตสำเร็จ
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                // ตรวจสอบว่า Order มีอยู่จริงหรือไม่
-                if (!OrderExists(id))
-                {
-                    return NotFound(new { message = $"Order with ID {id} not found." }); // ส่งสถานะ 404 ถ้าไม่พบ
-                }
-
-                // ส่งสถานะ 500 หากเกิดข้อผิดพลาดอื่น
-                return StatusCode(500, new { message = "An error occurred while updating the order." });
-            }
-        }
-
-        // DELETE: api/Orders/{id}
-        [HttpDelete("{id}")] // ระบุว่าเป็น HTTP DELETE พร้อมรับค่า {id} จาก URL
-        public async Task<IActionResult> DeleteOrder(int id)
+        // PUT: api/Orders/{id}/complete
+        [HttpPut("{id}/complete")] // ระบุว่าเป็น HTTP PUT สำหรับการทำเครื่องหมายคำสั่งซื้อให้เสร็จสมบูรณ์
+        public async Task<IActionResult> CompleteOrder(int id)
         {
             try
             {
-                // ค้นหา Order ตาม ID
                 var order = await _context.Orders.FindAsync(id);
                 if (order == null)
                 {
-                    return NotFound(new { message = $"Order with ID {id} not found." }); // ส่งสถานะ 404 ถ้าไม่พบ
+                    return NotFound(new { message = $"Order with ID {id} not found." });
                 }
 
-                _context.Orders.Remove(order); // ลบ Order จากฐานข้อมูล
-                await _context.SaveChangesAsync(); // บันทึกการเปลี่ยนแปลงในฐานข้อมูลแบบ Asynchronous
+                order.Status = "Completed"; // ตั้งค่า Status เป็น "Completed"
+                await _context.SaveChangesAsync(); // บันทึกการเปลี่ยนแปลง
 
-                return NoContent(); // ส่งสถานะ 204 เมื่อการลบสำเร็จ
+                _logger.LogInformation($"Order {id} marked as complete.");
+                return NoContent(); // ส่งสถานะ 204 เมื่อการอัปเดตเสร็จสมบูรณ์
             }
             catch (System.Exception ex)
             {
-                // ส่งสถานะ 500 และข้อความเมื่อมีข้อผิดพลาด
-                return StatusCode(500, new { message = "An error occurred while deleting the order.", error = ex.Message });
+                _logger.LogError(ex, "An error occurred while completing the order.");
+                return StatusCode(500, new { message = "An error occurred while completing the order.", error = ex.Message });
             }
         }
 
-        // ตรวจสอบว่า Order มีอยู่ในฐานข้อมูลหรือไม่
-        private bool OrderExists(int id)
+        // PUT: api/Orders/{id}/cancel
+        [HttpPut("{id}/cancel")] // ระบุว่าเป็น HTTP PUT สำหรับการยกเลิกคำสั่งซื้อ
+        public async Task<IActionResult> CancelOrder(int id)
         {
-            return _context.Orders.Any(e => e.TransactionId == id); // คืนค่า true ถ้าพบ Order ที่มี ID ตรงกัน
+            try
+            {
+                var order = await _context.Orders.FindAsync(id);
+                if (order == null)
+                {
+                    return NotFound(new { message = $"Order with ID {id} not found." });
+                }
+
+                order.Status = "Cancelled"; // ตั้งค่า Status เป็น "Cancelled"
+                await _context.SaveChangesAsync(); // บันทึกการเปลี่ยนแปลง
+
+                _logger.LogInformation($"Order {id} marked as cancelled.");
+                return NoContent(); // ส่งสถานะ 204 เมื่อการยกเลิกเสร็จสมบูรณ์
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while canceling the order.");
+                return StatusCode(500, new { message = "An error occurred while canceling the order.", error = ex.Message });
+            }
         }
     }
 }

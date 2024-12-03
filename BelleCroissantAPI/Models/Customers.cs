@@ -40,7 +40,7 @@ namespace BelleCroissantAPI.Models
         [MaxLength(20)]
         public string MembershipStatus { get; set; } = "Basic";
 
-        public DateTime? JoinDate { get; set; }
+        public DateTime? JoinDate { get; set; } = DateTime.Now;/* Default Value ในกรณีที่ไม่ได้ระบุวันที่ เช่น ค่า DateTime.Now สำหรับ JoinDate*/
         public DateTime? LastPurchaseDate { get; set; }
 
         [Required]
@@ -58,7 +58,8 @@ namespace BelleCroissantAPI.Models
         public string PreferredCategory { get; set; }
 
         public bool? Churned { get; set; }
-        public virtual ICollection<Order> Orders { get; set; }
+        // Remove [Required] attribute here to make Orders optional
+        public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
 
         // Navigation Properties - คอมเมนต์หรือเอาออก
