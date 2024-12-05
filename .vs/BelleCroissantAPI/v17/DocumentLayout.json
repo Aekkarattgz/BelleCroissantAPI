@@ -3,20 +3,8 @@
   "WorkspaceRootPath": "D:\\BelleCroissantAPI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\controllers\\productscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\controllers\\productscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\models\\products.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\models\\products.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\models\\orders.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\models\\orders.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\models\\orderitems.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -27,12 +15,24 @@
       "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\models\\customers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\controllers\\customerscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\controllers\\customerscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\controllers\\productscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\controllers\\productscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\models\\orders.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\models\\orders.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\models\\products.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\models\\products.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\controllers\\customerscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|solutionrelative:bellecroissantapi\\controllers\\customerscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{CF361C8A-2F7B-4A2F-B140-8C81FE24532A}|BelleCroissantAPI\\BelleCroissantAPI.csproj|d:\\bellecroissantapi\\bellecroissantapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
@@ -58,43 +58,43 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "ProductsController.cs",
               "DocumentMoniker": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Controllers\\ProductsController.cs",
               "RelativeDocumentMoniker": "BelleCroissantAPI\\Controllers\\ProductsController.cs",
               "ToolTip": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Controllers\\ProductsController.cs",
               "RelativeToolTip": "BelleCroissantAPI\\Controllers\\ProductsController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJsAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAIoAAAAAAAAAAAA8wKkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-03T15:22:18.843Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 2,
               "Title": "Customers.cs",
               "DocumentMoniker": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Models\\Customers.cs",
               "RelativeDocumentMoniker": "BelleCroissantAPI\\Models\\Customers.cs",
               "ToolTip": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Models\\Customers.cs",
               "RelativeToolTip": "BelleCroissantAPI\\Models\\Customers.cs",
-              "ViewState": "AgIAACwAAAAAAAAAAAAIwD0AAABTAAAAAAAAAA==",
+              "ViewState": "AgIAAC8AAAAAAAAAAAAIwD0AAABTAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-26T05:14:41.916Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 1,
               "Title": "OrderItems.cs",
               "DocumentMoniker": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Models\\OrderItems.cs",
               "RelativeDocumentMoniker": "BelleCroissantAPI\\Models\\OrderItems.cs",
               "ToolTip": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Models\\OrderItems.cs",
               "RelativeToolTip": "BelleCroissantAPI\\Models\\OrderItems.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAA1wA4AAAASAAAAAAAAAA==",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAQwA4AAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-26T05:15:45.241Z",
               "EditorCaption": ""
@@ -109,11 +109,12 @@
               "RelativeToolTip": "BelleCroissantAPI\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAB6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2024-11-26T11:21:27.593Z"
+              "WhenOpened": "2024-11-26T11:21:27.593Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 5,
               "Title": "Products.cs",
               "DocumentMoniker": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Models\\Products.cs",
               "RelativeDocumentMoniker": "BelleCroissantAPI\\Models\\Products.cs",
@@ -126,20 +127,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "OrdersController.cs",
               "DocumentMoniker": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Controllers\\OrdersController.cs",
               "RelativeDocumentMoniker": "BelleCroissantAPI\\Controllers\\OrdersController.cs",
               "ToolTip": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Controllers\\OrdersController.cs",
               "RelativeToolTip": "BelleCroissantAPI\\Controllers\\OrdersController.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAQwBsAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAABoAAAAAAAAAAAA1wCQAAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-26T07:17:46.214Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "CustomersController.cs",
               "DocumentMoniker": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Controllers\\CustomersController.cs",
               "RelativeDocumentMoniker": "BelleCroissantAPI\\Controllers\\CustomersController.cs",
@@ -152,20 +153,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 0,
               "Title": "Orders.cs",
               "DocumentMoniker": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Models\\Orders.cs",
               "RelativeDocumentMoniker": "BelleCroissantAPI\\Models\\Orders.cs",
               "ToolTip": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Models\\Orders.cs",
               "RelativeToolTip": "BelleCroissantAPI\\Models\\Orders.cs",
-              "ViewState": "AgIAABkAAAAAAAAAAAAAAC8AAAAIAAAAAAAAAA==",
+              "ViewState": "AgIAABcAAAAAAAAAAAAAwDIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-26T05:15:09.956Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\BelleCroissantAPI\\BelleCroissantAPI\\Program.cs",
               "RelativeDocumentMoniker": "BelleCroissantAPI\\Program.cs",
@@ -186,7 +187,8 @@
               "RelativeToolTip": "BelleCroissantAPI\\Data\\ApplicationDbContext.cs",
               "ViewState": "AgIAAAwAAAAAAAAAAAA0wCgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-26T05:33:29.963Z"
+              "WhenOpened": "2024-11-26T05:33:29.963Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -198,7 +200,8 @@
               "RelativeToolTip": "BelleCroissantAPI\\WeatherForecast.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-26T07:33:26.858Z"
+              "WhenOpened": "2024-11-26T07:33:26.858Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",

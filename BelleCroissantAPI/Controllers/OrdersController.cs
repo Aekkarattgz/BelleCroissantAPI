@@ -34,7 +34,7 @@ namespace BelleCroissantAPI.Controllers
                     .Include(o => o.OrderItems) // Include ข้อมูล OrderItems
                     .ThenInclude(oi => oi.Product) // Include Product ภายใน OrderItems
                     .AsNoTracking() // ใช้ AsNoTracking เพื่อปรับปรุงประสิทธิภาพสำหรับการอ่านข้อมูล
-                    .Take(50) // จำกัดผลลัพธ์ที่ดึงออกมาเป็น 50 แถว
+                    .Take(100) // จำกัดผลลัพธ์ที่ดึงออกมาเป็น 50 แถว
                     .ToListAsync(); // เรียกข้อมูลในรูปแบบ List แบบ Asynchronous
 
                 // เช็คว่ามีข้อมูลหรือไม่
